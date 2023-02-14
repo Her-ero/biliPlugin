@@ -1,11 +1,14 @@
 // ==UserScript==
-// @name        视频播放量和互动量
-// @namespace   Violentmonkey Scripts
-// @match       https://www.bilibili.com/video/*
-// @grant       none
-// @version     1.3
-// @author      -
-// @description 2022/8/10 17:51:27
+// @name          视频播放量和互动量
+// @version       1.3
+// @description   帮助查看视频的播放量和互动量
+// @namespace     https://github.com/Her-ero
+// @supportURL    https://github.com/Her-ero/biliPlugin/issues
+// @match         *://www.bilibili.com/video/*
+// @include       *://www.bilibili.com/video/*
+// @author        Her-ero
+// @updateURL     https://her-ero.github.io/biliPlugin/videoData/videoPlayAndEngage.js
+// @grant         none
 // ==/UserScript==
 (function(){
     'use strict';
