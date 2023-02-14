@@ -6,7 +6,7 @@
 // @namespace     https://github.com/Her-ero
 // @supportURL    https://github.com/Her-ero/biliPlugin
 // @homepageURL   https://github.com/Her-ero/biliPlugin
-// @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.js
+// @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
 // @match         *://space.bilibili.com/*
 // @include       *://space.bilibili.com/*/video
 // @icon          https://static.hdslb.com/images/favicon.ico

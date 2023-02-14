@@ -6,7 +6,7 @@
 // @namespace     https://github.com/Her-ero
 // @supportURL    https://github.com/Her-ero/biliPlugin
 // @homepageURL   https://github.com/Her-ero/biliPlugin
-// @updateURL     https://her-ero.github.io/biliPlugin/videoData/videoPlaysAndEngage.js
+// @updateURL     https://her-ero.github.io/biliPlugin/videoData/videoPlaysAndEngage.user.js
 // @match         *://www.bilibili.com/video/*
 // @include       *://www.bilibili.com/video/*
 // @icon          https://static.hdslb.com/images/favicon.ico
