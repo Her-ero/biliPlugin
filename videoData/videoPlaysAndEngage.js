@@ -7,7 +7,7 @@
 // @match         *://www.bilibili.com/video/*
 // @include       *://www.bilibili.com/video/*
 // @author        Her-ero
-// @updateURL     https://her-ero.github.io/biliPlugin/videoData/videoPlayAndEngage.js
+// @updateURL     https://her-ero.github.io/biliPlugin/videoData/videoPlaysAndEngage.js
 // @grant         none
 // ==/UserScript==
 (function(){

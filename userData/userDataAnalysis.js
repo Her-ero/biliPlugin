@@ -240,7 +240,7 @@
           const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
           // 点赞
           const likes = dataPanel.children[2].title.replace(/[^\d]/g, '');
-          // 播放
+          // 总播放
           const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
   
           // 首页近30视频平均播放量
