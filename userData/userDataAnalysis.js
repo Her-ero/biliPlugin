@@ -11,6 +11,7 @@
 // @include       *://space.bilibili.com/*/video
 // @icon          https://static.hdslb.com/images/favicon.ico
 // @grant         none
+// @license       MPL-2.0
 // ==/UserScript==
 (function () {
     'use strict';
