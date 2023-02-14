@@ -1,15 +1,15 @@
 // ==UserScript==
-// @name        B站个人页面数据
-// @version     3.1
+// @name          B站个人页面数据
+// @version       3.1.1
 // @description   辅助分析UP主的相关数据
 // @author        Her-ero
-// @namespace   https://github.com/Her-ero
+// @namespace     https://github.com/Her-ero
 // @supportURL    https://github.com/Her-ero/biliPlugin
-// @homepageURL     https://github.com/Her-ero/biliPlugin
+// @homepageURL   https://github.com/Her-ero/biliPlugin
 // @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.js
-// @match       *://space.bilibili.com/*
-// @include     *://space.bilibili.com/*/video
-// @grant       none
+// @match         *://space.bilibili.com/*
+// @include       *://space.bilibili.com/*/video
+// @grant         none
 // ==/UserScript==
 (function () {
     'use strict';
