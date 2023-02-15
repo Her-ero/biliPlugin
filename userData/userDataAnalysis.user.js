@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.1.2
+// @version       3.1.3
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
 // @supportURL    https://github.com/Her-ero/biliPlugin
-// @homepageURL   https://github.com/Her-ero/biliPlugin
+// @homepageURL   https://github.com/Her-ero/biliPlugin/tree/main/userData
 // @downloadURL   https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
 // @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
 // @match         *://space.bilibili.com/*
