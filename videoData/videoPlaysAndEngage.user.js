@@ -92,7 +92,10 @@
         coinCountNum = getCountNum(coinRaw)
         collectCountNum = getCountNum(collectRaw)
         shareCountNum = getCountNum(shareRaw)
-        commentCountNum = Number(commentCountElm.textContent)
+        // commentCountNum = Number(commentCountElm.textContent)
+        if (commentCountElm && commentCountElm.textContent) {
+            commentCountNum = Number(commentCountElm.textContent)
+        }
 
         console.log('----------------------------------------')
         console.log('viewCountNum: ', viewCountNum)
@@ -110,7 +113,7 @@
         console.log('互动数:', EngageCountNum)
 
         if (refreshCount === 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #00AEEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
+            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #007FEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
             dataList.insertAdjacentHTML('afterbegin', newElement)
         } else {
             const engElement = document.querySelector('#hudong')
