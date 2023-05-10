@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.4.3
+// @version       1.5
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -69,10 +69,10 @@
 
         const viewElement = document.querySelector('.view.item')
         const dmElement = document.querySelector('.dm.item')
-        const likeRaw = document.querySelector('.like .info-text').innerText
-        const coinRaw = document.querySelector('.coin .info-text').innerText
-        const collectRaw = document.querySelector('.collect .info-text').innerText
-        const shareRaw = document.querySelector('#share-btn-outer .info-text').innerText
+        const likeRaw = document.querySelector('.video-like-info.video-toolbar-item-text').innerText
+        const coinRaw = document.querySelector('.video-coin-info.video-toolbar-item-text').innerText
+        const collectRaw = document.querySelector('.video-fav-info.video-toolbar-item-text').innerText
+        const shareRaw = document.querySelector('.video-share-wrap.video-toolbar-left-item').children[0].innerText
 
         const dataList = document.querySelector('.video-data-list')
         const commentCountElm = document.querySelector('.total-reply')
