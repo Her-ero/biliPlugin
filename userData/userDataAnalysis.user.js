@@ -8,7 +8,7 @@
 // @homepageURL   https://github.com/Her-ero/biliPlugin/tree/main/userData
 // @downloadURL   https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
 // @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
-// @match         *://space.bilibili.com/*
+// @match         *://space.bilibili.com/*/video
 // @include       *://space.bilibili.com/*/video
 // @icon          https://static.hdslb.com/images/favicon.ico
 // @grant         none
