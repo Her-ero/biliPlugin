@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2.1
+// @version       3.2.2
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -215,7 +215,7 @@ color: #F00!important;
 
     async function getData1(uid) {
         // Default options are marked with *
-        const response = await fetch(`https://api.bilibili.com/x/space/arc/search?mid=${uid}`)
+        const response = await fetch(`https://api.bilibili.com/x/space/arc/search?mid=${uid}`);
         return response.json();
     }
 
@@ -233,7 +233,7 @@ color: #F00!important;
      * @property {number} data.follower - 粉丝数
      */
     async function getData2(uid) {
-        const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
+        const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`);
         return response.json();
     }
 
@@ -246,14 +246,14 @@ color: #F00!important;
         if (refreshCount >= 2) {
             clearInterval(timer)
         }
-        refreshCount += 1
-        console.log(`这是第${refreshCount}次刷数据`)
+        refreshCount += 1;
+        console.log(`这是第${refreshCount}次刷数据`);
 
         // UP名字
-        const idName = document.querySelector('#h-name').innerText
+        const idName = document.querySelector('#h-name').innerText;
         // n-statistics
         // n-data n-gz// 关注
-        const dataPanel = document.querySelector('.n-statistics')
+        const dataPanel = document.querySelector('.n-statistics');
         // 粉丝
         const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
         // 点赞
@@ -262,10 +262,10 @@ color: #F00!important;
         const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
 
         // 总视频数 从标签处获得
-        totalVideo = document.querySelector('.contribution-list').children[0].children[1].innerText || 0
+        totalVideo = document.querySelector('.contribution-list').children[0].children[1].innerText || 0;
 
         // "/39668304/video"
-        const pathname = window.location.pathname
+        const pathname = window.location.pathname;
         const uid = pathname.split('/')[1]
 
         // 拿关注和粉丝数
@@ -273,14 +273,14 @@ color: #F00!important;
         // console.log('UP data: ', upDataRes.data)
 
         // 视频容器节点
-        const videoUl = document.querySelector('ul.cube-list')
+        const videoUl = document.querySelector('ul.cube-list');
         // const videoli1 = videoUl.children[0].querySelector('span.play')
         // videoli1.children[1].innerText
         const videoUlArr = Array.from(videoUl.children);
 
         // 循环读取
         videoUlArr.forEach((item, index) => {
-            const currVideoViewText = item.querySelector('span.play').children[1].innerText
+            const currVideoViewText = item.querySelector('span.play').children[1].innerText;
             if (index < 5) {
                 // console.log(currVideoViewText)
                 videoPlayCount5 += convertStr(currVideoViewText)
@@ -292,13 +292,13 @@ color: #F00!important;
         })
 
         // 近5条视频平均播放量
-        const avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5))
+        const avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5));
         // 首页近30视频平均播放量
-        const avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length)
+        const avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length);
         // 平均播放数量
-        const videoAvgViews = formatNum(Number(views) / Number(totalVideo))
+        const videoAvgViews = formatNum(Number(views) / Number(totalVideo));
         // 播放/粉丝
-        const viewsPerFollowers = formatNum(Number(views) / Number(followers))
+        const viewsPerFollowers = formatNum(Number(views) / Number(followers));
 
         const dataElement = `<div class="n-data">
 <p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
@@ -317,9 +317,16 @@ color: #F00!important;
         if (refreshCount === 1) {
             dataPanel.insertAdjacentHTML('beforeend', newDiv)
         } else {
-            const myDataEl = document.querySelector('#myData')
+            const myDataEl = document.querySelector('#myData');
             myDataEl.innerHTML = dataElement
         }
+
+      // 视频数
+      totalVideo = 0;
+      // 近5视频播放计数
+      videoPlayCount5 = 0;
+      // 近30视频播放计数
+      videoPlayCount30 = 0;
 
     }, getRandomInt({ min: 100, max: 2552,}))
 
