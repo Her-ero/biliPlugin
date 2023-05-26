@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2
+// @version       3.2.1
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -12,9 +12,10 @@
 // @include       *://space.bilibili.com/*/video
 // @icon          https://static.hdslb.com/images/favicon.ico
 // @grant         none
+// @run-at        document-end
 // @license       MPL-2.0
 // ==/UserScript==
-(function () {
+(async function () {
     'use strict';
     console.log(`----Start Tool----`)
 
@@ -69,6 +70,31 @@ color: #F00!important;
 
     let headNode = document.querySelector('head');
     headNode.appendChild(styleNode)
+
+    // 刷新计数
+    let refreshCount = 0
+    // 视频列表
+    let videoList = []
+    // 视频数
+    let totalVideo = 0
+    // 近5视频播放计数
+    let videoPlayCount5 = 0
+    // 近30视频播放计数
+    let videoPlayCount30 = 0
+    // // 近5视频评论计数
+    // let videoCommentCount5 = 0
+    // // 近30视频评论计数
+    // let videoCommentCount30 = 0
+    // // 近5视频弹幕计数
+    // let videoDanmuCount5 = 0
+    // // 近30视频弹幕计数
+    // let videoDanmuCount30 = 0
+
+    function getRandomInt({ min = 0, max = 1, }) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
     function playColorCalc(num) {
         // 橙色
@@ -174,36 +200,130 @@ color: #F00!important;
         return Number.parseFloat(x).toFixed(0);
     }
 
-    async function getData1() {
+    /**
+     *
+     * @param str
+     * @returns {number}
+     */
+    function convertStr(str = '') {
+        if (str.includes('万')) {
+            return parseFloat(str) * 10000;
+        } else {
+            return parseFloat(str);
+        }
+    }
+
+    async function getData1(uid) {
         // Default options are marked with *
         const response = await fetch(`https://api.bilibili.com/x/space/arc/search?mid=${uid}`)
         return response.json();
     }
 
-    // "/39668304/video"
-    const pathname = window.location.pathname
-    const uid = pathname.split('/')[1]
+    /**
+     * 获取用户信息
+     * @returns {Object} 用户信息对象
+     * @property {number} code - 返回码
+     * @property {string} message - 返回消息
+     * @property {number} ttl - 有效期
+     * @property {Object} data - 数据对象
+     * @property {number} data.mid - 用户ID
+     * @property {number} data.following - 关注数
+     * @property {number} data.whisper - 悄悄话数
+     * @property {number} data.black - 黑名单数
+     * @property {number} data.follower - 粉丝数
+     */
+    async function getData2(uid) {
+        const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
+        return response.json();
+    }
 
-    // 刷新计数
-    let refreshCount = 0
-    // 视频列表
-    let videoList = []
-    // 视频数
-    let totalVideo = 0
-    // 近5视频播放计数
-    let videoPlayCount5 = 0
-    // 近30视频播放计数
-    let videoPlayCount30 = 0
-    // 近5视频评论计数
-    let videoCommentCount5 = 0
-    // 近30视频评论计数
-    let videoCommentCount30 = 0
-    // 近5视频弹幕计数
-    let videoDanmuCount5 = 0
-    // 近30视频弹幕计数
-    let videoDanmuCount30 = 0
+    await new Promise(resolve => setTimeout(resolve, getRandomInt({
+        min: 0,
+        max: 1000,
+    })));
 
-    fetch(`https://api.bilibili.com/x/space/wbi/arc/search?mid=${uid}`, {
+    const timer = setInterval(async function() {
+        if (refreshCount >= 2) {
+            clearInterval(timer)
+        }
+        refreshCount += 1
+        console.log(`这是第${refreshCount}次刷数据`)
+
+        // UP名字
+        const idName = document.querySelector('#h-name').innerText
+        // n-statistics
+        // n-data n-gz// 关注
+        const dataPanel = document.querySelector('.n-statistics')
+        // 粉丝
+        const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
+        // 点赞
+        const likes = dataPanel.children[2].title.replace(/[^\d]/g, '');
+        // 总播放
+        const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
+
+        // 总视频数 从标签处获得
+        totalVideo = document.querySelector('.contribution-list').children[0].children[1].innerText || 0
+
+        // "/39668304/video"
+        const pathname = window.location.pathname
+        const uid = pathname.split('/')[1]
+
+        // 拿关注和粉丝数
+        // const upDataRes = await getData2(uid)
+        // console.log('UP data: ', upDataRes.data)
+
+        // 视频容器节点
+        const videoUl = document.querySelector('ul.cube-list')
+        // const videoli1 = videoUl.children[0].querySelector('span.play')
+        // videoli1.children[1].innerText
+        const videoUlArr = Array.from(videoUl.children);
+
+        // 循环读取
+        videoUlArr.forEach((item, index) => {
+            const currVideoViewText = item.querySelector('span.play').children[1].innerText
+            if (index < 5) {
+                // console.log(currVideoViewText)
+                videoPlayCount5 += convertStr(currVideoViewText)
+            }
+            if (index < 30) {
+                // console.log(convertStr(currVideoViewText))
+                videoPlayCount30 += convertStr(currVideoViewText)
+            }
+        })
+
+        // 近5条视频平均播放量
+        const avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5))
+        // 首页近30视频平均播放量
+        const avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length)
+        // 平均播放数量
+        const videoAvgViews = formatNum(Number(views) / Number(totalVideo))
+        // 播放/粉丝
+        const viewsPerFollowers = formatNum(Number(views) / Number(followers))
+
+        const dataElement = `<div class="n-data">
+<p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
+</div><div class="n-data">
+<p class="n-data-k"><b>近30</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</b>
+</div>
+<div class="n-data">
+<p class="n-data-k"><b>近5播</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</b>
+</div>
+<div class="n-data" style="border-left: 1px solid #000;">
+<p class="n-data-k">播/粉</p><p class="n-data-v">${viewsPerFollowers}</p>
+</div>
+`
+        const newDiv = `<div id="myData" class="n-statistics" style="border-left: 1px solid #000;">${dataElement}</div>`;
+
+        if (refreshCount === 1) {
+            dataPanel.insertAdjacentHTML('beforeend', newDiv)
+        } else {
+            const myDataEl = document.querySelector('#myData')
+            myDataEl.innerHTML = dataElement
+        }
+
+    }, getRandomInt({ min: 100, max: 2552,}))
+
+    /*fetch(`https://api.bilibili.com/x/space/wbi/arc/search?mid=${uid}`, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
         },
@@ -248,18 +368,6 @@ color: #F00!important;
             // console.log('videoPlayCount5: ', videoPlayCount5)
             // console.log('videoPlayCount30: ', videoPlayCount30)
 
-            // UP名字
-            const idName = document.querySelector('#h-name').innerText
-            // n-statistics
-            // n-data n-gz// 关注
-            const dataPanel = document.querySelector('.n-statistics')
-            // 粉丝
-            const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
-            // 点赞
-            const likes = dataPanel.children[2].title.replace(/[^\d]/g, '');
-            // 总播放
-            const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
-
             // 首页近30视频平均播放量
             const avgPlayVideo30 = formatNum(videoPlayCount30 / videoList.length)
             // 首页近30视频平均弹幕量
@@ -277,7 +385,7 @@ color: #F00!important;
             // 平均播放数量
             const videoAvgViews = formatNum(Number(views) / Number(totalVideo))
             // 平均赞数量
-            const videoAvglikes = formatNum(Number(likes) / Number(totalVideo))
+            const videoAvgLikes = formatNum(Number(likes) / Number(totalVideo))
             // 播放/粉丝
             const viewsPerFollowers = formatNum(Number(views) / Number(followers))
 
@@ -286,7 +394,7 @@ color: #F00!important;
 全投稿平均播放: ${videoAvgViews}
 最近30条视频均播: ${avgPlayVideo30}
 最近5条视频均播: ${avgPlayVideo5}
-平均点赞: ${videoAvglikes}
+平均点赞: ${videoAvgLikes}
 
 总播放量/粉丝数: ${viewsPerFollowers}
 
@@ -295,7 +403,7 @@ color: #F00!important;
 粉丝数: ${followers}
 总播放量: ${views}
 总点赞数: ${likes}
-平均点赞: ${videoAvglikes}
+平均点赞: ${videoAvgLikes}
 
 首页视频数: ${videoList.length}
 最近30条视频总播: ${videoPlayCount30}
@@ -320,7 +428,7 @@ color: #F00!important;
 <p class="n-data-k"><b>近5播</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</b>
 </div>
 <div class="n-data">
-<p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvglikes)}">${videoAvglikes}</b>
+<p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</b>
 </div>
 <div class="n-data" style="border-left: 1px solid #000;">
 <p class="n-data-k"><b>近30弹幕</b></p><b class="n-data-v ${danmuColorCalc(avgDanmuVideo30)}">${avgDanmuVideo30}</b>
@@ -351,5 +459,5 @@ color: #F00!important;
     })
     .catch((e) => {
       console.log('Err: ', e)
-    })
+    })*/
 })()
