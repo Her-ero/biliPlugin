@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2.2
+// @version       3.2.3
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -297,6 +297,8 @@ color: #F00!important;
         const avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length);
         // 平均播放数量
         const videoAvgViews = formatNum(Number(views) / Number(totalVideo));
+        // 平均赞数量
+        const videoAvgLikes = formatNum(Number(likes) / Number(totalVideo));
         // 播放/粉丝
         const viewsPerFollowers = formatNum(Number(views) / Number(followers));
 
@@ -307,6 +309,9 @@ color: #F00!important;
 </div>
 <div class="n-data">
 <p class="n-data-k"><b>近5播</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</b>
+</div>
+<div class="n-data">
+<p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</b>
 </div>
 <div class="n-data" style="border-left: 1px solid #000;">
 <p class="n-data-k">播/粉</p><p class="n-data-v">${viewsPerFollowers}</p>
@@ -329,6 +334,8 @@ color: #F00!important;
       videoPlayCount30 = 0;
 
     }, getRandomInt({ min: 100, max: 2552,}))
+
+    // return
 
     /*fetch(`https://api.bilibili.com/x/space/wbi/arc/search?mid=${uid}`, {
         headers: {
@@ -388,13 +395,6 @@ color: #F00!important;
             const avgDanmuVideo5 = formatNum(videoDanmuCount5 / (videoList.length < 5 ? videoList.length : 5))
             // 近5条视频平均评论量
             const avgCommentVideo5 = formatNum(videoCommentCount5 / (videoList.length < 5 ? videoList.length : 5))
-
-            // 平均播放数量
-            const videoAvgViews = formatNum(Number(views) / Number(totalVideo))
-            // 平均赞数量
-            const videoAvgLikes = formatNum(Number(likes) / Number(totalVideo))
-            // 播放/粉丝
-            const viewsPerFollowers = formatNum(Number(views) / Number(followers))
 
             const info = `
 【UP: ${idName}】
