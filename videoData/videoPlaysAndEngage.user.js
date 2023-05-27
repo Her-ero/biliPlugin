@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.5
+// @version       1.5.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -14,9 +14,23 @@
 // @grant         none
 // @license       MPL-2.0
 // ==/UserScript==
-(function () {
+(async function () {
     'use strict';
-    let refreshCount = 0
+    let styleNode = document.createElement("style");
+    styleNode.setAttribute("type", "text/css");
+    styleNode.innerHTML = `
+.video-info-v1 .video-data .video-data-list .item {
+margin-right: 7px;
+}
+.pudate-text {
+color: #222;
+}
+`;
+    let headNode = document.querySelector('head');
+    headNode.appendChild(styleNode)
+
+
+    let refreshCount = 0;
 
     // 四舍五入
     function formatNumToStr(x) {
@@ -52,6 +66,24 @@
         }
     }
 
+    /**
+     * 获取用户信息
+     * @returns {Object} 用户信息对象
+     * @property {number} code - 返回码
+     * @property {string} message - 返回消息
+     * @property {number} ttl - 有效期
+     * @property {Object} data - 数据对象
+     * @property {number} data.mid - 用户ID
+     * @property {number} data.following - 关注数
+     * @property {number} data.whisper - 悄悄话数
+     * @property {number} data.black - 黑名单数
+     * @property {number} data.follower - 粉丝数
+     */
+    async function getData2(uid) {
+        const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
+        return response.json();
+    }
+
     const timer = setInterval(function () {
         // setTimeout(function() {
 
@@ -66,6 +98,7 @@
         let collectCountNum = 0
         let shareCountNum = 0
         let commentCountNum = 0
+        let followerCountNum = 0
 
         const viewElement = document.querySelector('.view.item')
         const dmElement = document.querySelector('.dm.item')
@@ -112,17 +145,19 @@
         const EngageCountNum = dmCountNum + likeCountNum + coinCountNum + collectCountNum + shareCountNum + commentCountNum
         console.log('互动数:', EngageCountNum)
 
-        if (refreshCount === 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #007FEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
+        // <span id="follow" title="粉丝数" class="item" style="color: #ecd200"><b>互动: ${followerCountNum}</b></span>
+        if (refreshCount <= 0) {
+            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播: ${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹幕: ${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评: ${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互动: ${EngageCountNum}</b></span>`
             dataList.insertAdjacentHTML('afterbegin', newElement)
         } else {
-            const engElement = document.querySelector('#hudong')
             const commentEl = document.querySelector('#pinglun')
-            engElement.innerHTML = `<b>互动：${EngageCountNum}</b>`
-            commentEl.innerHTML = `<b>评论：${commentCountNum}</b>`
+            const engElement = document.querySelector('#hudong')
+            commentEl.innerHTML = `<b>评: ${commentCountNum}</b>`
+            engElement.innerHTML = `<b>互动: ${EngageCountNum}</b>`
         }
         refreshCount += 1
-
+        // const cpright = document.querySelector('.copyright.item');
+        // cpright.innerHTML = '';
         // console.log('--------------------[End]--------------------')
     }, 2000)
 })()
