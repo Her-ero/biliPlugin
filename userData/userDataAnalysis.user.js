@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2.3
+// @version       3.2.4
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -72,15 +72,15 @@ color: #F00!important;
     headNode.appendChild(styleNode)
 
     // 刷新计数
-    let refreshCount = 0
+    let refreshCount = 0;
     // 视频列表
-    let videoList = []
+    let videoList = [];
     // 视频数
-    let totalVideo = 0
+    let totalVideo = 0;
     // 近5视频播放计数
-    let videoPlayCount5 = 0
+    let videoPlayCount5 = 0;
     // 近30视频播放计数
-    let videoPlayCount30 = 0
+    let videoPlayCount30 = 0;
     // // 近5视频评论计数
     // let videoCommentCount5 = 0
     // // 近30视频评论计数
@@ -89,6 +89,16 @@ color: #F00!important;
     // let videoDanmuCount5 = 0
     // // 近30视频弹幕计数
     // let videoDanmuCount30 = 0
+    // 平均播放数量
+    let videoAvgViews = 0;
+    // 首页近30视频平均播放量
+    let avgPlayVideo30 = 0;
+    // 近5条视频平均播放量
+    let avgPlayVideo5 = 0;
+    // 平均赞数量
+    let videoAvgLikes = 0;
+    // 播放/粉丝
+    let viewsPerFollowers = 0;
 
     function getRandomInt({ min = 0, max = 1, }) {
         min = Math.ceil(min);
@@ -238,8 +248,8 @@ color: #F00!important;
     }
 
     await new Promise(resolve => setTimeout(resolve, getRandomInt({
-        min: 0,
-        max: 1000,
+        min: 800,
+        max: 1200,
     })));
 
     const timer = setInterval(async function() {
@@ -256,6 +266,8 @@ color: #F00!important;
         const dataPanel = document.querySelector('.n-statistics');
         // 粉丝
         const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
+        const followerCount = document.getElementById('n-fs')
+        followerCount.innerText = followers
         // 点赞
         const likes = dataPanel.children[2].title.replace(/[^\d]/g, '');
         // 总播放
@@ -291,16 +303,16 @@ color: #F00!important;
             }
         })
 
-        // 近5条视频平均播放量
-        const avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5));
-        // 首页近30视频平均播放量
-        const avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length);
         // 平均播放数量
-        const videoAvgViews = formatNum(Number(views) / Number(totalVideo));
+        videoAvgViews = formatNum(Number(views) / Number(totalVideo));
+        // 首页近30视频平均播放量
+        avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length);
+        // 近5条视频平均播放量
+        avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5));
         // 平均赞数量
-        const videoAvgLikes = formatNum(Number(likes) / Number(totalVideo));
+        videoAvgLikes = formatNum(Number(likes) / Number(totalVideo));
         // 播放/粉丝
-        const viewsPerFollowers = formatNum(Number(views) / Number(followers));
+        viewsPerFollowers = formatNum(Number(views) / Number(followers));
 
         const dataElement = `<div class="n-data">
 <p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
@@ -326,14 +338,13 @@ color: #F00!important;
             myDataEl.innerHTML = dataElement
         }
 
-      // 视频数
-      totalVideo = 0;
-      // 近5视频播放计数
-      videoPlayCount5 = 0;
-      // 近30视频播放计数
-      videoPlayCount30 = 0;
+        // 近5视频播放计数
+        videoPlayCount5 = 0;
+        // 近30视频播放计数
+        videoPlayCount30 = 0;
 
-    }, getRandomInt({ min: 100, max: 2552,}))
+
+    }, getRandomInt({ min: 900, max: 2552,}))
 
     // return
 
