@@ -52,7 +52,7 @@
     const timer = setInterval(function () {
         // setTimeout(function() {
 
-        if (refreshCount >= 4) {
+        if (refreshCount >= 3) {
             clearInterval(timer)
         }
 
@@ -69,11 +69,10 @@
         const viewElement = document.querySelector('.view.item')
         const dmElement = document.querySelector('.dm.item')
         const datetimeEl = document.querySelector('.pudate-ip.item').querySelector('.pudate')
-
-        const likeRaw = document.querySelector('.like .info-text').innerText
-        const coinRaw = document.querySelector('.coin .info-text').innerText
-        const collectRaw = document.querySelector('.collect .info-text').innerText
-        const shareRaw = document.querySelector('#share-btn-outer .info-text').innerText
+        const likeRaw = document.querySelector('.video-like-info.video-toolbar-item-text').innerText
+        const coinRaw = document.querySelector('.video-coin-info.video-toolbar-item-text').innerText
+        const collectRaw = document.querySelector('.video-fav-info.video-toolbar-item-text').innerText
+        const shareRaw = document.querySelector('.video-share-wrap.video-toolbar-left-item').children[0].innerText
 
         const dataList = document.querySelector('.video-data-list')
         const commentCountElm = document.querySelector('.total-reply')
@@ -94,6 +93,7 @@
         coinCountNum = getCountNum(coinRaw)
         collectCountNum = getCountNum(collectRaw)
         shareCountNum = getCountNum(shareRaw)
+        // commentCountNum = Number(commentCountElm.textContent)
         if (commentCountElm && commentCountElm.textContent) {
             commentCountNum = Number(commentCountElm.textContent)
         }
@@ -117,7 +117,9 @@
         const url = `${window.location.origin}${window.location.pathname}`
 
         // const ClipboardVal = `${titleStr}	${url}	${datetimeStr}`
-        const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
+        // const ClipboardVal = `${likeCountNum}	${coinCountNum}	${collectCountNum}	${shareCountNum}	${commentCountNum}	${dmCountNum}`
+        // const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
+        const ClipboardVal = `${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
         // 申请使用剪切板权限
         navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
             // 可能是 'granted', 'denied' or 'prompt':
@@ -142,7 +144,7 @@
         });
 
         if (refreshCount === 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #00AEEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
+            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #007FEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
             dataList.insertAdjacentHTML('afterbegin', newElement)
         } else {
             const engElement = document.querySelector('#hudong')
@@ -152,8 +154,8 @@
         }
         refreshCount += 1
 
-        // console.log('--------------------[End]--------------------')       
-    }, 2000)
+        // console.log('--------------------[End]--------------------')
+    }, 2200)
 })()
 
 // navigator.permissions.query({ name: 'clipboard-read' }).then(function (result) {
