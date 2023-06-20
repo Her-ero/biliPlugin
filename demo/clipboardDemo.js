@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name          Demo
+// @name          自动复制粘贴视频信息
 // @version       0.0.1
-// @description   test
+// @description   自动复制粘贴视频信息
 // @author        1
 // @namespace     1
 // @match         *://www.bilibili.com/video/*
@@ -11,9 +11,23 @@
 // @run-at        document-end
 // @license       MPL-2.0
 // ==/UserScript==
-(function () {
+(async function () {
     'use strict';
-    let refreshCount = 0
+    let styleNode = document.createElement("style");
+    styleNode.setAttribute("type", "text/css");
+    styleNode.innerHTML = `
+.video-info-v1 .video-data .video-data-list .item {
+margin-right: 7px;
+}
+.pudate-text {
+color: #222;
+}
+`;
+    let headNode = document.querySelector('head');
+    headNode.appendChild(styleNode)
+
+
+    let refreshCount = 0;
 
     // 四舍五入
     function formatNumToStr(x) {
@@ -49,10 +63,28 @@
         }
     }
 
+    /**
+     * 获取用户信息
+     * @returns {Object} 用户信息对象
+     * @property {number} code - 返回码
+     * @property {string} message - 返回消息
+     * @property {number} ttl - 有效期
+     * @property {Object} data - 数据对象
+     * @property {number} data.mid - 用户ID
+     * @property {number} data.following - 关注数
+     * @property {number} data.whisper - 悄悄话数
+     * @property {number} data.black - 黑名单数
+     * @property {number} data.follower - 粉丝数
+     */
+    async function getData2(uid) {
+        const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
+        return response.json();
+    }
+
     const timer = setInterval(function () {
         // setTimeout(function() {
 
-        if (refreshCount >= 3) {
+        if (refreshCount >= 4) {
             clearInterval(timer)
         }
 
@@ -65,6 +97,10 @@
         let collectCountNum = 0
         let shareCountNum = 0
         let commentCountNum = 0
+        let followerCountNum = 0
+
+        const upNameElm = document.querySelector('.up-name').childNodes[0];
+        const upName = upNameElm.textContent.trim();
 
         const viewElement = document.querySelector('.view.item')
         const dmElement = document.querySelector('.dm.item')
@@ -119,7 +155,7 @@
         // const ClipboardVal = `${titleStr}	${url}	${datetimeStr}`
         // const ClipboardVal = `${likeCountNum}	${coinCountNum}	${collectCountNum}	${shareCountNum}	${commentCountNum}	${dmCountNum}`
         // const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
-        const ClipboardVal = `${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
+        const ClipboardVal = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
         // 申请使用剪切板权限
         navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
             // 可能是 'granted', 'denied' or 'prompt':
@@ -127,14 +163,14 @@
                 // 可以使用权限
                 // 进行clipboard的操作
                 navigator.clipboard.writeText(ClipboardVal).then(
-                    function () {
-                        /* clipboard successfully set */
-                        // 成功设置了剪切板
-                    },
-                    function () {
-                        /* clipboard write failed */
-                        // 剪切板内容写入失败
-                    }
+                  function () {
+                      /* clipboard successfully set */
+                      // 成功设置了剪切板
+                  },
+                  function () {
+                      /* clipboard write failed */
+                      // 剪切板内容写入失败
+                  }
                 );
             } else if (result.state === 'prompt') {
                 // 弹窗弹框申请使用权限
@@ -143,38 +179,19 @@
             }
         });
 
-        if (refreshCount === 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播放：${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #E11"><b>互动：${EngageCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #007FEC"><b>评论：${commentCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #2bb291"><b>弹幕：${dmCountNum}</b></span>`
+        // <span id="follow" title="粉丝数" class="item" style="color: #ecd200"><b>互动: ${followerCountNum}</b></span>
+        if (refreshCount <= 0) {
+            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播: ${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹幕: ${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评: ${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互动: ${EngageCountNum}</b></span>`
             dataList.insertAdjacentHTML('afterbegin', newElement)
         } else {
-            const engElement = document.querySelector('#hudong')
             const commentEl = document.querySelector('#pinglun')
-            engElement.innerHTML = `<b>互动：${EngageCountNum}</b>`
-            commentEl.innerHTML = `<b>评论：${commentCountNum}</b>`
+            const engElement = document.querySelector('#hudong')
+            commentEl.innerHTML = `<b>评: ${commentCountNum}</b>`
+            engElement.innerHTML = `<b>互动: ${EngageCountNum}</b>`
         }
         refreshCount += 1
-
+        // const cpright = document.querySelector('.copyright.item');
+        // cpright.innerHTML = '';
         // console.log('--------------------[End]--------------------')
     }, 2200)
 })()
-
-// navigator.permissions.query({ name: 'clipboard-read' }).then(function (result) {
-//     // 可能是 'granted', 'denied' or 'prompt':
-//     if (result.state === 'granted') {
-//         // 可以使用权限
-//         // 进行clipboard的操作
-//         navigator.clipboard
-//             .readText()
-//             .then(text => {
-//                 console.log('复制粘贴文本: ', text);
-//             })
-//             .catch(err => {
-//                 // 读取剪切板内容失败
-//                 console.error('Failed to read clipboard contents: ', err)
-//             });
-//     } else if (result.state === 'prompt') {
-//         // 弹窗弹框申请使用权限
-//     } else {
-//         // 如果被拒绝，请不要做任何操作。
-//     }
-// })
