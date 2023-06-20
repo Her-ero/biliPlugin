@@ -100,6 +100,9 @@ color: #222;
         let commentCountNum = 0
         let followerCountNum = 0
 
+        const upNameElm = document.querySelector('.up-name').childNodes[0];
+        const upName = upNameElm.textContent.trim();
+
         const viewElement = document.querySelector('.view.item')
         const dmElement = document.querySelector('.dm.item')
         const likeRaw = document.querySelector('.video-like-info.video-toolbar-item-text').innerText
