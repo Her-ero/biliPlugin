@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.5.1
+// @version       1.5.2
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -12,6 +12,7 @@
 // @include       *://www.bilibili.com/video/*
 // @icon          https://static.hdslb.com/images/favicon.ico
 // @grant         none
+// @run-at        document-end
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
