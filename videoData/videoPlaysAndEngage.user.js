@@ -92,8 +92,10 @@ color: #222;
             clearInterval(timer)
         }
 
+        let titleStr = document.querySelector('h1').title
         let viewCountNum = 0
         let dmCountNum = 0
+        let datetimeStr = ''
         let likeCountNum = 0
         let coinCountNum = 0
         let collectCountNum = 0
