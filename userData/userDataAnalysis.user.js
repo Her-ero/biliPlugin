@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2.5
+// @version       3.3.0
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -99,6 +99,8 @@ color: #F00!important;
     let videoAvgLikes = 0;
     // 播放/粉丝
     let viewsPerFollowers = 0;
+    // 均赞/均播（4%激励指标）
+    let avgLikesPerAvgViews = 0;
 
     function getRandomInt({ min = 0, max = 1, }) {
         min = Math.ceil(min);
@@ -150,6 +152,31 @@ color: #F00!important;
         }
         // 黑色
         if (num > 199) {
+            return 't5'
+        }
+        // 红色
+        return 't6'
+    }
+
+    function bonusColorCalc(num) {
+        // 橙色
+        if (num > 0.05) {
+            return 't1'
+        }
+        // 紫色
+        if (num > 0.04) {
+            return 't2'
+        }
+        // 蓝色
+        if (num > 0.03) {
+            return 't3'
+        }
+        // 绿色
+        if (num > 0.02) {
+            return 't4'
+        }
+        // 黑色
+        if (num > 0.01) {
             return 't5'
         }
         // 红色
@@ -313,6 +340,9 @@ color: #F00!important;
         videoAvgLikes = formatNum(Number(likes) / Number(totalVideo));
         // 播放/粉丝
         viewsPerFollowers = formatNum(Number(views) / Number(followers));
+        // 均赞/均播（4%激励指标）
+        // new Intl.NumberFormat("zh-CN", {style: "percent", minimumFractionDigits: 2}).format(num);
+        avgLikesPerAvgViews = new Intl.NumberFormat("zh-CN", {style: "percent", minimumFractionDigits: 2}).format(Number(videoAvgLikes) / Number(videoAvgViews));
 
         const dataElement = `<div class="n-data">
 <p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
@@ -325,8 +355,8 @@ color: #F00!important;
 <div class="n-data">
 <p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</b>
 </div>
-<div class="n-data" style="border-left: 1px solid #000;">
-<p class="n-data-k">播/粉</p><p class="n-data-v">${viewsPerFollowers}</p>
+<div class="n-data" style="border-left:1px solid #000;">
+<p class="n-data-k"><b>赞/播</b></p><b class="n-data-v ${bonusColorCalc(Number(videoAvgLikes) / Number(videoAvgViews))}">${avgLikesPerAvgViews}</b>
 </div>
 `
         const newDiv = `<div id="myData" class="n-statistics" style="border-left: 1px solid #000;">${dataElement}</div>`;
