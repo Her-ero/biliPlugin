@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.2.4
+// @version       3.2.5
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
