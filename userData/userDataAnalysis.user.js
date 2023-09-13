@@ -269,7 +269,7 @@ color: #F00!important;
         const followerCount = document.getElementById('n-fs')
         followerCount.innerText = followers
         // 点赞
-        const likes = dataPanel.children[2].title.replace(/[^\d]/g, '');
+        const likes = dataPanel.children[2].title.slice(12).replace(/[^\d]/g, '');
         // 总播放
         const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
 
