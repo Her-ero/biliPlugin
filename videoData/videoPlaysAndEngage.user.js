@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.6.0
+// @version       1.6.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -141,7 +141,7 @@ color: #222;
             }
         }
         refreshCount += 1
-    }, 2000)
+    }, 3000)
     return
 
     const timer = setInterval(function () {
