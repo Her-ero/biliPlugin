@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.6.1
+// @version       1.7.0
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -20,11 +20,30 @@
     let styleNode = document.createElement("style");
     styleNode.setAttribute("type", "text/css");
     styleNode.innerHTML = `
-.video-info-container .video-info-detail .video-info-detail-list .item {
-margin-right: 7px;
+.video-info-detail-list.video-info-detail-content .item {
+margin-right: 3px;
 }
-.pudate-text {
-color: #222;
+.video-info-detail-list.video-info-detail-content .item.dm {
+margin-right: 2px;
+}
+.video-info-detail-list.video-info-detail-content .item .dm-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item .view-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item .video-argue-inner.pure-text.neutral .remark-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item .copyright-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content {
+/*height: auto;*/
 }
 `;
     let headNode = document.querySelector('head');
@@ -124,7 +143,7 @@ color: #222;
 
     console.log('EngageCountNum: ', EngageCountNum)
 
-    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播: ${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹幕: ${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评: ${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互动: ${EngageCountNum}</b></span>`
+    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
 
     const timer1 = setInterval(function () {
         if (refreshCount >= 4) {
@@ -134,7 +153,7 @@ color: #222;
 
         if (refreshCount <= 0) {
             dataList.insertAdjacentHTML('afterbegin', newElement)
-        } else {         
+        } else {
             const viewEl = document.querySelector('#bofang')
             if (!viewEl) {
                 dataList.insertAdjacentHTML('afterbegin', newElement)
@@ -202,13 +221,13 @@ color: #222;
 
         // <span id="follow" title="粉丝数" class="item" style="color: #ecd200"><b>互动: ${followerCountNum}</b></span>
         if (refreshCount <= 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播: ${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹幕: ${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评: ${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互动: ${EngageCountNum}</b></span>`
+            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
             dataList.insertAdjacentHTML('afterbegin', newElement)
         } else {
             const commentEl = document.querySelector('#pinglun')
             const engElement = document.querySelector('#hudong')
             commentEl.innerHTML = `<b>评: ${commentCountNum}</b>`
-            engElement.innerHTML = `<b>互动: ${EngageCountNum}</b>`
+            engElement.innerHTML = `<b>互: ${EngageCountNum}</b>`
         }
         refreshCount += 1
         // const cpright = document.querySelector('.copyright.item');
