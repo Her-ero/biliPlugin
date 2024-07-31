@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.3.0
+// @version       3.4.0
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -23,7 +23,7 @@
     styleNode.setAttribute("type", "text/css");
     styleNode.innerHTML = `
 .n {
-  margin-bottom: 75px;
+/* margin-bottom: 75px; */
 }
 .n .n-statistics {
 display: flex;
@@ -33,11 +33,18 @@ height: auto!important;
 padding: 0 0px 0 4px!important;
 }
 .n .n-data {
-width: 52px;
-border-left: 1px solid #ccc;
+min-width: 52px;
+border-left: 2px solid #000;
+padding: 1px 2px;
 }
 .n .n-data:not(:first-child) {
+}
 
+.n .n-data span.n-data-v, .n .n-data p.n-data-v {
+/* margin-top: 0px; */
+}
+.n .n-data .n-data-k {
+color: #000;
 }
 .n .n-btn {
   margin-right: 2px;
@@ -345,21 +352,21 @@ color: #F00!important;
         avgLikesPerAvgViews = new Intl.NumberFormat("zh-CN", {style: "percent", minimumFractionDigits: 2}).format(Number(videoAvgLikes) / Number(videoAvgViews));
 
         const dataElement = `<div class="n-data">
-<p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
+<p class="n-data-k"><span>均播</span></p><span class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</span>
 </div><div class="n-data">
-<p class="n-data-k"><b>近30</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</b>
+<p class="n-data-k"><span>近30</span></p><span class="n-data-v ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</span>
 </div>
 <div class="n-data">
-<p class="n-data-k"><b>近5播</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</b>
+<p class="n-data-k"><span>近5播</span></p><span class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</span>
 </div>
 <div class="n-data">
-<p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</b>
+<p class="n-data-k"><span>均赞</span></p><span class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</span>
 </div>
-<div class="n-data" style="border-left:1px solid #000;">
-<p class="n-data-k"><b>赞/播</b></p><b class="n-data-v ${bonusColorCalc(Number(videoAvgLikes) / Number(videoAvgViews))}">${avgLikesPerAvgViews}</b>
+<div class="n-data" style="border-left:2px solid #000;">
+<p class="n-data-k"><span>赞/播</span></p><span class="n-data-v ${bonusColorCalc(Number(videoAvgLikes) / Number(videoAvgViews))}">${avgLikesPerAvgViews}</span>
 </div>
 `
-        const newDiv = `<div id="myData" class="n-statistics" style="border-left: 1px solid #000;">${dataElement}</div>`;
+        const newDiv = `<div id="myData" class="n-statistics">${dataElement}</div>`;
 
         if (refreshCount === 1) {
             dataPanel.insertAdjacentHTML('beforeend', newDiv)
