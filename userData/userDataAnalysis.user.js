@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.4.0
+// @version       3.4.1
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -16,12 +16,12 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
-    'use strict';
-    console.log(`----Start Tool----`)
+'use strict';
+console.log(`----Start Tool----`)
 
-    let styleNode = document.createElement("style");
-    styleNode.setAttribute("type", "text/css");
-    styleNode.innerHTML = `
+let styleNode = document.createElement("style");
+styleNode.setAttribute("type", "text/css");
+styleNode.innerHTML = `
 .n {
 /* margin-bottom: 75px; */
 }
@@ -381,7 +381,7 @@ color: #F00!important;
         videoPlayCount30 = 0;
 
 
-    }, getRandomInt({ min: 900, max: 2552,}))
+    }, getRandomInt({ min: 900, max: 2521,}))
 
     // return
 

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.7.0
+// @version       1.7.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -16,10 +16,10 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
-    'use strict';
-    let styleNode = document.createElement("style");
-    styleNode.setAttribute("type", "text/css");
-    styleNode.innerHTML = `
+'use strict';
+let styleNode = document.createElement("style");
+styleNode.setAttribute("type", "text/css");
+styleNode.innerHTML = `
 .video-info-detail-list.video-info-detail-content .item {
 margin-right: 3px;
 }
@@ -46,9 +46,10 @@ transform: scale(0.8);
 /*height: auto;*/
 }
 `;
+    // 刷新的时间间隔
+    const DELAY_TIME_MS = 2400; // 2000-3000
     let headNode = document.querySelector('head');
     headNode.appendChild(styleNode)
-
 
     let refreshCount = 0;
 
@@ -160,78 +161,6 @@ transform: scale(0.8);
             }
         }
         refreshCount += 1
-    }, 3000)
+    }, DELAY_TIME_MS)
     return
-
-    const timer = setInterval(function () {
-        // setTimeout(function() {
-
-        if (refreshCount >= 4) {
-            clearInterval(timer)
-        }
-
-        const upNameElm = document.querySelector('.up-name').childNodes[0];
-        const upName = upNameElm.textContent.trim();
-
-        const viewElement = document.querySelector('.view.item')
-        const dmElement = document.querySelector('.dm.item').innerText
-        const likeRaw = document.querySelector('.video-like-info.video-toolbar-item-text').innerText
-        const coinRaw = document.querySelector('.video-coin-info.video-toolbar-item-text').innerText
-        const collectRaw = document.querySelector('.video-fav-info.video-toolbar-item-text').innerText
-        const shareRaw = document.querySelector('.video-share-wrap.video-toolbar-left-item').children[0].innerText
-
-        const dataList = document.querySelector('.video-info-detail-list')
-        const commentCountElm = document.querySelector('.total-reply')
-
-        // console.log('viewElement:', viewElement)
-        // console.log('dmElement:', dmElement)
-        // console.log('likeRaw: ', likeRaw)
-        // console.log('coinRaw: ', coinRaw)
-        // console.log('collectRaw: ', collectRaw)
-        // console.log('shareRaw: ', shareRaw)
-        // console.log('commentCountElm: ', commentCountElm)
-        console.log(`--------------------[Start ${refreshCount + 1}]--------------------`)
-
-        // B站不在这个地方放出数据了
-        // viewCountNum = getNumber2(viewElement.title)
-        dmCountNum = getNumber2(dmElement)
-        likeCountNum = getCountNum(likeRaw)
-        coinCountNum = getCountNum(coinRaw)
-        favoriteCountNum = getCountNum(collectRaw)
-        shareCountNum = getCountNum(shareRaw)
-        // commentCountNum = Number(commentCountElm.textContent)
-        if (commentCountElm && commentCountElm.textContent) {
-            commentCountNum = Number(commentCountElm.textContent)
-        }
-
-        console.log('----------------------------------------')
-        console.log('viewCountNum: ', viewCountNum)
-        console.log('dmCountNum: ', dmCountNum)
-        console.log('likeCountNum: ', likeCountNum)
-        console.log('coinCountNum: ', coinCountNum)
-        console.log('collectCountNum: ', favoriteCountNum)
-        console.log('shareCountNum: ', shareCountNum)
-        console.log('commentCountNum:', commentCountNum)
-
-        // viewElement.childNodes[1].textContent = viewCountNum
-        // dmElement.childNodes[1].textContent = dmCountNum
-
-        const EngageCountNum = dmCountNum + likeCountNum + coinCountNum + favoriteCountNum + shareCountNum + commentCountNum
-        console.log('互动数:', EngageCountNum)
-
-        // <span id="follow" title="粉丝数" class="item" style="color: #ecd200"><b>互动: ${followerCountNum}</b></span>
-        if (refreshCount <= 0) {
-            const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
-            dataList.insertAdjacentHTML('afterbegin', newElement)
-        } else {
-            const commentEl = document.querySelector('#pinglun')
-            const engElement = document.querySelector('#hudong')
-            commentEl.innerHTML = `<b>评: ${commentCountNum}</b>`
-            engElement.innerHTML = `<b>互: ${EngageCountNum}</b>`
-        }
-        refreshCount += 1
-        // const cpright = document.querySelector('.copyright.item');
-        // cpright.innerHTML = '';
-        // console.log('--------------------[End]--------------------')
-    }, 2000)
 })()
