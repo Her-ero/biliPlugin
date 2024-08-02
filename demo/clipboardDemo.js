@@ -94,12 +94,14 @@ color: #222;
     const dataList = document.querySelector('.video-info-detail-list')
     const videoData = await getVideoData(BV)
     console.log('view: ', videoData.data)
+    const datetimeEl = document.querySelector('.pubdate-ip-text')
 
 
     let titleStr = document.querySelector('h1').title
     let viewCountNum = videoData.data.stat.view
     let dmCountNum = videoData.data.stat.danmaku
-    let datetimeStr = '' // 时间
+    // let datetimeStr = '' // 时间
+    let datetimeStr = datetimeEl.innerText // 时间
     let likeCountNum = videoData.data.stat.like // 点赞
     let coinCountNum = videoData.data.stat.coin // 投币
     let favoriteCountNum = videoData.data.stat.favorite // 收藏
