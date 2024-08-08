@@ -1,9 +1,13 @@
 // ==UserScript==
 // @name          自动复制粘贴视频信息
-// @version       1.0.0
+// @version       1.0.1
 // @description   自动复制粘贴视频信息
-// @author        1
-// @namespace     1
+// @author        Her-ero
+// @namespace     https://github.com/Her-ero
+// @supportURL    https://github.com/Her-ero/biliPlugin
+
+
+
 // @match         *://www.bilibili.com/video/*
 // @include       *://www.bilibili.com/video/*
 // @icon          https://static.hdslb.com/images/favicon.ico
@@ -12,19 +16,46 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
-    'use strict';
-    let styleNode = document.createElement("style");
-    styleNode.setAttribute("type", "text/css");
-    styleNode.innerHTML = `
-.video-info-container .video-info-detail .video-info-detail-list .item {
-margin-right: 7px;
+'use strict';
+let styleNode = document.createElement("style");
+styleNode.setAttribute("type", "text/css");
+styleNode.innerHTML = `
+.video-info-detail-list.video-info-detail-content .item {
+margin-right: 3px;
 }
-.pudate-text {
-color: #222;
+.video-info-detail-list.video-info-detail-content .item.dm {
+margin-right: 2px;
+}
+.video-info-detail-list.video-info-detail-content .item .dm-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item .view-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item.pubdate-ip .pubdate-ip-text {
+color: #041a97;
+font-weight: bold;
+}
+.video-info-detail-list.video-info-detail-content .item .video-argue-inner.pure-text.neutral .remark-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content .item .copyright-icon {
+margin-right: -2px;
+transform: scale(0.8);
+}
+.video-info-detail-list.video-info-detail-content {
+/*height: auto;*/
 }
 `;
-    let headNode = document.querySelector('head');
-    headNode.appendChild(styleNode)
+let headNode = document.querySelector('head');
+headNode.appendChild(styleNode)
+
+    let refreshCount = 0;
+    // 刷新的时间间隔
+    const DELAY_TIME_MS = 2400; // 2000-3000
 
     function voiceNotice(freq) {
         // 创建 AudioContext
@@ -56,8 +87,6 @@ color: #222;
         oscillator.stop(audioCtx.currentTime + 1);
     }
 
-    let refreshCount = 0;
-
     // 拿数字1
     function getNumberStr(val) {
         console.log('getNumberStr: ', val)
@@ -76,7 +105,6 @@ color: #222;
         // return val.match(/\d+(\.\d+)?/))
     }
 
-
     // https://www.bilibili.com/video/BV19a4y1g7fe
     const pathname = window.location.pathname;
     // BV: BV19a4y1g7fe
@@ -88,14 +116,16 @@ color: #222;
     }
 
     const url = `${window.location.origin}${window.location.pathname}`
-    const upNameElm = document.querySelector('.up-name').childNodes[0];
-    const upName = upNameElm.textContent.trim();
-
+    const upNameElm = document.querySelector('.up-name')
+    let upName = ''
+    if (upNameElm) {
+        upName = upNameElm.childNodes[0].textContent.trim()
+    }
+    
     const dataList = document.querySelector('.video-info-detail-list')
+    const datetimeEl = document.querySelector('.pubdate-ip-text')
     const videoData = await getVideoData(BV)
     console.log('view: ', videoData.data)
-    const datetimeEl = document.querySelector('.pubdate-ip-text')
-
 
     let titleStr = document.querySelector('h1').title
     let viewCountNum = videoData.data.stat.view
@@ -152,7 +182,7 @@ color: #222;
     });
     /* clipboard end */
 
-    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播: ${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹幕: ${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评: ${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互动: ${EngageCountNum}</b></span>`
+    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
 
     const timer1 = setInterval(function () {
         if (refreshCount >= 4) {
@@ -162,6 +192,9 @@ color: #222;
 
         if (refreshCount <= 0) {
             dataList.insertAdjacentHTML('afterbegin', newElement)
+            // 隐藏弹幕显示
+            var dmTarget = document.querySelector('.dm.item')
+            dmTarget.style.display = 'none'
         } else {
             const viewEl = document.querySelector('#bofang')
             if (!viewEl) {
@@ -169,7 +202,7 @@ color: #222;
             }
         }
         refreshCount += 1
-    }, 3000)
+    }, DELAY_TIME_MS)
 
     const button = document.createElement("button")
     button.id = "getInfoBtn";

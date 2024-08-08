@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.7.1
+// @version       1.7.2
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -34,6 +34,10 @@ transform: scale(0.8);
 margin-right: -2px;
 transform: scale(0.8);
 }
+.video-info-detail-list.video-info-detail-content .item.pubdate-ip .pubdate-ip-text {
+color: #041a97;
+font-weight: bold;
+}
 .video-info-detail-list.video-info-detail-content .item .video-argue-inner.pure-text.neutral .remark-icon {
 margin-right: -2px;
 transform: scale(0.8);
@@ -46,12 +50,12 @@ transform: scale(0.8);
 /*height: auto;*/
 }
 `;
-    // 刷新的时间间隔
-    const DELAY_TIME_MS = 2400; // 2000-3000
-    let headNode = document.querySelector('head');
-    headNode.appendChild(styleNode)
+let headNode = document.querySelector('head');
+headNode.appendChild(styleNode)
 
     let refreshCount = 0;
+    // 刷新的时间间隔
+    const DELAY_TIME_MS = 2400; // 2000-3000
 
     // 四舍五入
     function formatNumToStr(x) {
@@ -116,14 +120,15 @@ transform: scale(0.8);
     }
 
     const dataList = document.querySelector('.video-info-detail-list')
+    // const datetimeEl = document.querySelector('.pubdate-ip-text')
     const videoData = await getVideoData(BV)
     console.log('view: ', videoData.data)
-
 
     let titleStr = document.querySelector('h1').title
     let viewCountNum = videoData.data.stat.view
     let dmCountNum = videoData.data.stat.danmaku
-    let datetimeStr = '' // 时间
+    // let datetimeStr = '' // 时间
+    // let datetimeStr = datetimeEl.innerText // 时间
     let likeCountNum = videoData.data.stat.like // 点赞
     let coinCountNum = videoData.data.stat.coin // 投币
     let favoriteCountNum = videoData.data.stat.favorite // 收藏
@@ -154,6 +159,9 @@ transform: scale(0.8);
 
         if (refreshCount <= 0) {
             dataList.insertAdjacentHTML('afterbegin', newElement)
+            // 隐藏弹幕显示
+            var dmTarget = document.querySelector('.dm.item')
+            dmTarget.style.display = 'none'
         } else {
             const viewEl = document.querySelector('#bofang')
             if (!viewEl) {
