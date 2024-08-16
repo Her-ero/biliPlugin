@@ -16,10 +16,10 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
-'use strict';
-let styleNode = document.createElement("style");
-styleNode.setAttribute("type", "text/css");
-styleNode.innerHTML = `
+    'use strict';
+    let styleNode = document.createElement("style");
+    styleNode.setAttribute("type", "text/css");
+    styleNode.innerHTML = `
 .video-info-detail-list.video-info-detail-content .item {
 margin-right: 3px;
 }
@@ -50,8 +50,8 @@ transform: scale(0.8);
 /*height: auto;*/
 }
 `;
-let headNode = document.querySelector('head');
-headNode.appendChild(styleNode)
+    let headNode = document.querySelector('head');
+    headNode.appendChild(styleNode)
 
     let refreshCount = 0;
     // 刷新的时间间隔
@@ -121,7 +121,7 @@ headNode.appendChild(styleNode)
     if (upNameElm) {
         upName = upNameElm.childNodes[0].textContent.trim()
     }
-    
+
     const dataList = document.querySelector('.video-info-detail-list')
     const datetimeEl = document.querySelector('.pubdate-ip-text')
     const videoData = await getVideoData(BV)
@@ -156,24 +156,36 @@ headNode.appendChild(styleNode)
     // const ClipboardVal = `${titleStr}	${url}	${datetimeStr}`
     // const ClipboardVal = `${viewCountNum}	${dmCountNum}	${likeCountNum}	${coinCountNum}	${favoriteCountNum}	${shareCountNum}	${commentCountNum}`
     // const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
-    const ClipboardVal = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
+    const formData1 = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
+    const formData2 = `${upName}	${titleStr}	${url}	${viewCountNum}	${datetimeStr}	${commentCountNum}`
+    /**
+     * 舆情报告B站
+     */
+    const formYuQing = `平台: B站
+产品：
+标题：${titleStr}
+VV: ${viewCountNum}，Eng: ${EngageCountNum}
+${url}
+
+总结：
+`
     // 申请使用剪切板权限
     navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
         // 可能是 'granted', 'denied' or 'prompt':
         if (result.state === 'granted') {
             // 可以使用权限
             // 进行clipboard的操作
-            navigator.clipboard.writeText(ClipboardVal).then(
-                function () {
-                    /* clipboard successfully set */
-                    // 成功设置了剪切板
-                    voiceNotice(196.00)
-                },
-                function () {
-                    /* clipboard write failed */
-                    // 剪切板内容写入失败
-                }
-            );
+            // navigator.clipboard.writeText(ClipboardValAuto).then(
+            //     function () {
+            //         /* clipboard successfully set */
+            //         // 成功设置了剪切板
+            //         voiceNotice(196.00)
+            //     },
+            //     function () {
+            //         /* clipboard write failed */
+            //         // 剪切板内容写入失败
+            //     }
+            // );
         } else if (result.state === 'prompt') {
             // 弹窗弹框申请使用权限
         } else {
@@ -204,41 +216,38 @@ headNode.appendChild(styleNode)
         refreshCount += 1
     }, DELAY_TIME_MS)
 
-    const button = document.createElement("button")
-    button.id = "getInfoBtn";
-    // button.className = "follow-btn-inner";
-    button.textContent = "复制数据";
-    button.style.zIndex = '1111'
-    button.style.position = 'fixed'
-    button.style.fontSize = '20px'
-    button.addEventListener("click", function () {
-        // 在这里编写您的预设代码
-        alert(ClipboardVal);
-        navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
-            // 可能是 'granted', 'denied' or 'prompt':
+    // 添加按钮
+    const createButton = (id, text, zIndex, left, fontSize, position, clickHandler) => {
+        const button = document.createElement("button");
+        Object.assign(button.style, {
+            zIndex,
+            left,
+            position,
+            fontSize,
+        });
+        button.id = id;
+        button.textContent = text;
+        button.addEventListener("click", clickHandler);
+        return button;
+    };
+
+    const handleButtonClick = (clipboardValue) => {
+        // alert(clipboardValue);
+        navigator.permissions.query({ name: 'clipboard-write' }).then(result => {
             if (result.state === 'granted') {
-                // 可以使用权限
-                // 进行clipboard的操作
-                navigator.clipboard.writeText(ClipboardVal).then(
-                    function () {
-                        /* clipboard successfully set */
-                        // 成功设置了剪切板
-                        voiceNotice(349.23)
-                    },
-                    function () {
-                        /* clipboard write failed */
-                        // 剪切板内容写入失败
-                    }
+                navigator.clipboard.writeText(clipboardValue).then(
+                    () => voiceNotice(349.23),
+                    () => console.error("Clipboard write failed")
                 );
-            } else if (result.state === 'prompt') {
-                // 弹窗弹框申请使用权限
-            } else {
-                // 如果被拒绝，请不要做任何操作。
             }
         });
-    });
-    // 替换为要添加按钮的目标元素的ID
-    const targetElement = document.querySelector('body');
-    targetElement.insertAdjacentElement('afterbegin', button);
+    };
 
+    const button1 = createButton("getInfoBtn1", "填表数据1", '1111', '0', '16px', 'absolute', () => handleButtonClick(formData1));
+    const button2 = createButton("getInfoBtn2", "填表数据2", '1111', '5%', '16px', 'absolute', () => handleButtonClick(formData2));
+    const button3 = createButton("getInfoBtn2", "舆情报告", '1111', '10%', '16px', 'absolute', () => handleButtonClick(formYuQing));
+
+    document.body.insertAdjacentElement('afterbegin', button1);
+    document.body.insertAdjacentElement('afterbegin', button2);
+    document.body.insertAdjacentElement('afterbegin', button3);
 })()
