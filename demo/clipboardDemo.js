@@ -169,6 +169,11 @@ ${url}
 
 总结：
 `
+    /**
+     * 标题、链接
+     */
+    const formData3 = `标题：${titleStr}\n${url}`
+
     // 申请使用剪切板权限
     navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
         // 可能是 'granted', 'denied' or 'prompt':
@@ -244,10 +249,12 @@ ${url}
     };
 
     const button1 = createButton("getInfoBtn1", "填表数据1", '1111', '0', '16px', 'absolute', () => handleButtonClick(formData1));
-    const button2 = createButton("getInfoBtn2", "填表数据2", '1111', '5%', '16px', 'absolute', () => handleButtonClick(formData2));
-    const button3 = createButton("getInfoBtn2", "舆情报告", '1111', '10%', '16px', 'absolute', () => handleButtonClick(formYuQing));
+    const button2 = createButton("getInfoBtn2", "填表数据2", '1111', '5.5%', '16px', 'absolute', () => handleButtonClick(formData2));
+    const button3 = createButton("getInfoBtn2", "舆情报告", '1111', '10.5%', '16px', 'absolute', () => handleButtonClick(formYuQing));
+    const button4 = createButton("getInfoBtn2", "标题链接", '1111', '16%', '16px', 'absolute', () => handleButtonClick(formData3));
 
     document.body.insertAdjacentElement('afterbegin', button1);
     document.body.insertAdjacentElement('afterbegin', button2);
     document.body.insertAdjacentElement('afterbegin', button3);
+    document.body.insertAdjacentElement('afterbegin', button4);
 })()
