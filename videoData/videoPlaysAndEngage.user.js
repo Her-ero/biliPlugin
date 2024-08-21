@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.7.2
+// @version       1.8.0
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -57,38 +57,34 @@ headNode.appendChild(styleNode)
     // 刷新的时间间隔
     const DELAY_TIME_MS = 2400; // 2000-3000
 
-    // 四舍五入
-    function formatNumToStr(x) {
-        return Number.parseFloat(x).toFixed(0);
-    }
+    function voiceNotice(freq) {
+        // 创建 AudioContext
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // 拿数字1
-    function getNumberStr(val) {
-        console.log('getNumberStr: ', val)
-        return val.match(/\d+(\.\d+)?/)
-        // return val.replace(/[^\d]/g, '')
-        // return val.replace(/\d+(\.\d+)?/, '')
-        // const res = val.match(/\d+(\.\d+)?/)
-        // return res ? res[0] : '0'
-    }
+        // 创建 OscillatorNode，用于生成音频信号
+        const oscillator = audioCtx.createOscillator();
+        // 创建一个GainNode,它可以控制音频的总音量
+        const gainNode = audioCtx.createGain();
 
-    // 拿数字2
-    function getNumber2(val) {
-        console.log('getNumber2: ', val)
-        return Number(val.replace(/[^\d]/g, ''))
-        // return val.replace(/\d+(\.\d+)?/, '')
-        // return val.match(/\d+(\.\d+)?/))
-    }
+        // 把音量，音调和终节点进行关联
+        oscillator.connect(gainNode);
+        // audioCtx.destination返回AudioDestinationNode对象，表示当前audio context中所有节点的最终节点，一般表示音频渲染设备
+        gainNode.connect(audioCtx.destination);
 
-    // 字符数字处理
-    function getCountNum(str) {
-        if (str === '点赞' || str === '投币' || str === '收藏' || str === '分享') {
-            return 0
-        } else if (str.indexOf('万') !== -1) {
-            return Number(getNumberStr(str)[0]) * 10000
-        } else {
-            return Number(getNumberStr(str)[0])
-        }
+        // 设置音频参数
+        oscillator.type = 'sine'; // 波形类型
+        oscillator.frequency.value = freq; // 频率（Hz）
+
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        // 0.01秒后音量为1
+        gainNode.gain.linearRampToValueAtTime(0.9, audioCtx.currentTime + 0.01);
+
+        // 开始播放
+        oscillator.start();
+        // 1秒内声音慢慢降低，是个不错的停止声音的方法
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+        // 1秒后完全停止声音
+        oscillator.stop(audioCtx.currentTime + 1);
     }
 
     /**
@@ -119,8 +115,15 @@ headNode.appendChild(styleNode)
         return response.json();
     }
 
+    const url = `${window.location.origin}${window.location.pathname}`
+    const upNameElm = document.querySelector('.up-name')
+    let upName = ''
+    if (upNameElm) {
+        upName = upNameElm.childNodes[0].textContent.trim()
+    }
+
     const dataList = document.querySelector('.video-info-detail-list')
-    // const datetimeEl = document.querySelector('.pubdate-ip-text')
+    const datetimeEl = document.querySelector('.pubdate-ip-text')
     const videoData = await getVideoData(BV)
     console.log('view: ', videoData.data)
 
@@ -128,7 +131,7 @@ headNode.appendChild(styleNode)
     let viewCountNum = videoData.data.stat.view
     let dmCountNum = videoData.data.stat.danmaku
     // let datetimeStr = '' // 时间
-    // let datetimeStr = datetimeEl.innerText // 时间
+    let datetimeStr = datetimeEl.innerText // 时间
     let likeCountNum = videoData.data.stat.like // 点赞
     let coinCountNum = videoData.data.stat.coin // 投币
     let favoriteCountNum = videoData.data.stat.favorite // 收藏
@@ -139,6 +142,7 @@ headNode.appendChild(styleNode)
     console.log('----------------------------------------')
     console.log('viewCountNum: ', viewCountNum)
     console.log('dmCountNum: ', dmCountNum)
+    console.log('datetimeStr: ', datetimeStr)
     console.log('likeCountNum: ', likeCountNum)
     console.log('coinCountNum: ', coinCountNum)
     console.log('collectCountNum: ', favoriteCountNum)
@@ -146,8 +150,54 @@ headNode.appendChild(styleNode)
     console.log('commentCountNum: ', commentCountNum)
 
     let EngageCountNum = dmCountNum + likeCountNum + coinCountNum + favoriteCountNum + shareCountNum + commentCountNum
+    // console.log('EngageCountNum: ', EngageCountNum)
 
-    console.log('EngageCountNum: ', EngageCountNum)
+    /* clipboard start */
+    // const ClipboardVal = `${titleStr}	${url}	${datetimeStr}`
+    // const ClipboardVal = `${viewCountNum}	${dmCountNum}	${likeCountNum}	${coinCountNum}	${favoriteCountNum}	${shareCountNum}	${commentCountNum}`
+    // const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
+    const formData1 = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
+    const formData2 = `${upName}	${titleStr}	${url}	${viewCountNum}	${datetimeStr}	${commentCountNum}`
+    /**
+     * 舆情报告B站
+     */
+    const formYuQing = `平台: B站
+产品：
+标题：${titleStr}
+VV: ${viewCountNum}，Eng: ${EngageCountNum}
+${url}
+
+总结：
+`
+    /**
+     * 标题、链接
+     */
+    const formData3 = `标题：${titleStr}\n${url}`
+
+    // 申请使用剪切板权限
+    navigator.permissions.query({ name: 'clipboard-write' }).then(function (result) {
+        // 可能是 'granted', 'denied' or 'prompt':
+        if (result.state === 'granted') {
+            // 可以使用权限
+            // 进行clipboard的操作
+            // navigator.clipboard.writeText(ClipboardValAuto).then(
+            //     function () {
+            //         /* clipboard successfully set */
+            //         // 成功设置了剪切板
+            //         voiceNotice(196.00)
+            //     },
+            //     function () {
+            //         /* clipboard write failed */
+            //         // 剪切板内容写入失败
+            //     }
+            // );
+        } else if (result.state === 'prompt') {
+            // 弹窗弹框申请使用权限
+        } else {
+            // 如果被拒绝，请不要做任何操作。
+        }
+    });
+    /* clipboard end */
 
     const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
 
@@ -170,5 +220,42 @@ headNode.appendChild(styleNode)
         }
         refreshCount += 1
     }, DELAY_TIME_MS)
+
+    // 添加按钮
+    const createButton = (id, text, zIndex, left, fontSize, position, clickHandler) => {
+        const button = document.createElement("button");
+        Object.assign(button.style, {
+            zIndex,
+            left,
+            position,
+            fontSize,
+        });
+        button.id = id;
+        button.textContent = text;
+        button.addEventListener("click", clickHandler);
+        return button;
+    };
+
+    const handleButtonClick = (clipboardValue) => {
+        // alert(clipboardValue);
+        navigator.permissions.query({ name: 'clipboard-write' }).then(result => {
+            if (result.state === 'granted') {
+                navigator.clipboard.writeText(clipboardValue).then(
+                    () => voiceNotice(349.23),
+                    () => console.error("Clipboard write failed")
+                );
+            }
+        });
+    };
+
+    const button1 = createButton("getInfoBtn1", "填表数据1", '1111', '0', '16px', 'absolute', () => handleButtonClick(formData1));
+    const button2 = createButton("getInfoBtn2", "填表数据2", '1111', '5.5%', '16px', 'absolute', () => handleButtonClick(formData2));
+    const button3 = createButton("getInfoBtn2", "舆情报告", '1111', '10.5%', '16px', 'absolute', () => handleButtonClick(formYuQing));
+    const button4 = createButton("getInfoBtn2", "标题链接", '1111', '16%', '16px', 'absolute', () => handleButtonClick(formData3));
+
+    document.body.insertAdjacentElement('afterbegin', button1);
+    document.body.insertAdjacentElement('afterbegin', button2);
+    document.body.insertAdjacentElement('afterbegin', button3);
+    document.body.insertAdjacentElement('afterbegin', button4);
     return
 })()
