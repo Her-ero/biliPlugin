@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.8.0
+// @version       1.8.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -161,13 +161,11 @@ headNode.appendChild(styleNode)
     /**
      * 舆情报告B站
      */
-    const formYuQing = `平台: B站
-产品：
-标题：${titleStr}
+    const formYuQing = `标题：${titleStr}
 VV: ${viewCountNum}，Eng: ${EngageCountNum}
 ${url}
 
-总结：
+内容：
 `
     /**
      * 标题、链接
