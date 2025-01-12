@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.8.1
+// @version       1.9.0
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -16,6 +16,9 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
+
+const pathname = window.location.pathname;
+
 'use strict';
 let styleNode = document.createElement("style");
 styleNode.setAttribute("type", "text/css");
@@ -104,16 +107,17 @@ headNode.appendChild(styleNode)
         const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
         return response.json();
     }
-
-    // https://www.bilibili.com/video/BV19a4y1g7fe
-    const pathname = window.location.pathname;
-    // BV: BV19a4y1g7fe
-    const BV = pathname.split('/')[2]
-
-    async function getVideoData(BVID) {
-        const response = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${BVID}`)
+    
+    async function getVideoData({BV, AV}) {
+        if (BV) {
+            const response = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${BV}`)
+            return response.json();
+        }
+        const response = await fetch(`https://api.bilibili.com/x/web-interface/view?aid=${AV}`)
         return response.json();
     }
+
+
 
     const url = `${window.location.origin}${window.location.pathname}`
     const upNameElm = document.querySelector('.up-name')
@@ -124,7 +128,23 @@ headNode.appendChild(styleNode)
 
     const dataList = document.querySelector('.video-info-detail-list')
     const datetimeEl = document.querySelector('.pubdate-ip-text')
-    const videoData = await getVideoData(BV)
+    
+    // 检查页面是av还是BV
+    // https://www.bilibili.com/video/av113775831220963/
+    const match = pathname.match(/av(\d+)/);
+    let videoData = null
+    // 如果匹配成功，提取数字
+    if (match) {
+        const avNum = match[1];
+        console.log(avNum); // 输出: 113775831220963
+        videoData = await getVideoData({AV: avNum})
+    } else {
+        // https://www.bilibili.com/video/BV19a4y1g7fe
+        // const pathname = window.location.pathname;
+        // BV: BV19a4y1g7fe
+        const BV = pathname.split('/')[2]
+        videoData = await getVideoData({BV: BV})
+    }
     console.log('view: ', videoData.data)
 
     let titleStr = document.querySelector('h1').title
