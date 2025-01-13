@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.9.0
+// @version       1.9.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -217,7 +217,7 @@ ${url}
     });
     /* clipboard end */
 
-    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span>`
+    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span>`
 
     const timer1 = setInterval(function () {
         if (refreshCount >= 4) {
