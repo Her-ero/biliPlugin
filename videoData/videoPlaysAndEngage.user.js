@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.9.1
+// @version       1.9.2
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -177,6 +177,7 @@ headNode.appendChild(styleNode)
     // const ClipboardVal = `${viewCountNum}	${dmCountNum}	${likeCountNum}	${coinCountNum}	${favoriteCountNum}	${shareCountNum}	${commentCountNum}`
     // const ClipboardVal = `${datetimeStr}	${titleStr}	${commentCountNum}	${url}`
     const formData1 = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}`
+    // const formData1 = `${upName}	${titleStr}	${url}	${datetimeStr}	${viewCountNum}	${EngageCountNum}	${commentCountNum}	${dmCountNum}	${likeCountNum}	${coinCountNum}	${favoriteCountNum}	${shareCountNum}`
     const formData2 = `${upName}	${titleStr}	${url}	${viewCountNum}	${datetimeStr}	${commentCountNum}`
     /**
      * 舆情报告B站
