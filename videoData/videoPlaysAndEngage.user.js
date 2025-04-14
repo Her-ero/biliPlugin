@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.9.2
+// @version       1.9.3
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -217,8 +217,9 @@ ${url}
         }
     });
     /* clipboard end */
+    // 弹 评 赞 币 藏 转
 
-    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #2bb291"><b>评:${commentCountNum}</b></span>`
+    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #9c27b0"><b>评:${commentCountNum}</b></span><span id="zan" title="赞" class="item" style="color: #9c27b0"><b>赞:${likeCountNum}</b></span><span id="bi" title="投币" class="item" style="color: #9c27b0"><b>币:${coinCountNum}</b></span><span id="cang" title="收藏" class="item" style="color: #9c27b0"><b>藏:${favoriteCountNum}</b></span><span id="zhuan" title="转发" class="item" style="color: #9c27b0"><b>转:${shareCountNum}</b></span>`
 
     const timer1 = setInterval(function () {
         if (refreshCount >= 4) {
