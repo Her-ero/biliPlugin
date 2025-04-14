@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站UP主数据分析
-// @version       3.4.1
+// @version       3.5.0
 // @description   辅助分析B站UP主的相关数据
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -8,8 +8,8 @@
 // @homepageURL   https://github.com/Her-ero/biliPlugin/tree/main/userData
 // @downloadURL   https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
 // @updateURL     https://her-ero.github.io/biliPlugin/userData/userDataAnalysis.user.js
-// @match         *://space.bilibili.com/*/video
-// @include       *://space.bilibili.com/*/video
+// @match         *://space.bilibili.com/*/upload/video
+// @include       *://space.bilibili.com/*/upload/video
 // @icon          https://static.hdslb.com/images/favicon.ico
 // @grant         none
 // @run-at        document-end
@@ -22,32 +22,29 @@ console.log(`----Start Tool----`)
 let styleNode = document.createElement("style");
 styleNode.setAttribute("type", "text/css");
 styleNode.innerHTML = `
-.n {
-/* margin-bottom: 75px; */
+.nav-statistics__item.jumpable,
+.nav-statistics__item {
+margin-left:0!important;
 }
-.n .n-statistics {
-display: flex;
-}
-.n .n-inner {
-height: auto!important;
-padding: 0 0px 0 4px!important;
-}
-.n .n-data {
-min-width: 52px;
-border-left: 2px solid #000;
-padding: 1px 2px;
-}
-.n .n-data:not(:first-child) {
-}
-
-.n .n-data span.n-data-v, .n .n-data p.n-data-v {
-/* margin-top: 0px; */
-}
-.n .n-data .n-data-k {
+#myData {
+background: #F0F0F0;
 color: #000;
 }
-.n .n-btn {
-  margin-right: 2px;
+#myData.ctr {
+display: flex;
+}
+#myData .item {
+padding: 1px 3px;
+}
+#myData .item:not(:first-child) {
+
+}
+#myData .item .item-word {
+margin-bottom: 5px;
+font-size: 13px;
+}
+#myData .item .item-num {
+font-size: 14px;
 }
 /*橙色*/
 .t1 {
@@ -294,21 +291,26 @@ color: #F00!important;
         console.log(`这是第${refreshCount}次刷数据`);
 
         // UP名字
-        const idName = document.querySelector('#h-name').innerText;
+        const idName = document.querySelector('.nickname').innerText;
         // n-statistics
         // n-data n-gz// 关注
-        const dataPanel = document.querySelector('.n-statistics');
+        const dataPanel = document.querySelector('.nav-statistics');
         // 粉丝
-        const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
-        const followerCount = document.getElementById('n-fs')
+        // const followers = dataPanel.children[1].title.replace(/[^\d]/g, '');
+        const followers = document.querySelectorAll('.nav-statistics__item.jumpable')[1].children[1].title.replace(/[^\d]/g, '');
+        const followerCount = document.querySelectorAll('.nav-statistics__item.jumpable')[1].children[1]
         followerCount.innerText = followers
         // 点赞
-        const likes = dataPanel.children[2].title.slice(12).replace(/[^\d]/g, '');
+        // const likes = dataPanel.children[2].title.slice(12).replace(/[^\d]/g, '');
+        // document.querySelector('.nav-statistics').children[0]
+        // dataPanel.children[2]
+        const likes = dataPanel.children[2].children[1].title.match(/([\d,]+)/g, '')[3].replaceAll(',', '')
         // 总播放
-        const views = dataPanel.children[3].title.replace(/[^\d]/g, '');
+        // const views = document.querySelector('.nav-statistics').children[2].children[1].title.match(/([\d,]+)/g, '')[0].replace(',', '')
+        const views = dataPanel.children[3].children[1].title.match(/([\d,]+)/g, '')[0].replaceAll(',', '')
 
         // 总视频数 从标签处获得
-        totalVideo = document.querySelector('.contribution-list').children[0].children[1].innerText || 0;
+        totalVideo = document.querySelector('.side-nav__item__sub-text').innerText || 0;
 
         // "/39668304/video"
         const pathname = window.location.pathname;
@@ -319,14 +321,14 @@ color: #F00!important;
         // console.log('UP data: ', upDataRes.data)
 
         // 视频容器节点
-        const videoUl = document.querySelector('ul.cube-list');
+        const videoUl = document.querySelector('.video-list.grid-mode');
         // const videoli1 = videoUl.children[0].querySelector('span.play')
         // videoli1.children[1].innerText
-        const videoUlArr = Array.from(videoUl.children);
+        const videoList = Array.from(videoUl.children);
 
         // 循环读取
-        videoUlArr.forEach((item, index) => {
-            const currVideoViewText = item.querySelector('span.play').children[1].innerText;
+        videoList.forEach((item, index) => {
+            const currVideoViewText = item.querySelector('.bili-cover-card__stat').innerText;
             if (index < 5) {
                 // console.log(currVideoViewText)
                 videoPlayCount5 += convertStr(currVideoViewText)
@@ -340,9 +342,9 @@ color: #F00!important;
         // 平均播放数量
         videoAvgViews = formatNum(Number(views) / Number(totalVideo));
         // 首页近30视频平均播放量
-        avgPlayVideo30 = formatNum(videoPlayCount30 / videoUlArr.length);
+        avgPlayVideo30 = formatNum(videoPlayCount30 / videoList.length);
         // 近5条视频平均播放量
-        avgPlayVideo5 = formatNum(videoPlayCount5 / (videoUlArr.length < 5 ? videoUlArr.length : 5));
+        avgPlayVideo5 = formatNum(videoPlayCount5 / (videoList.length < 5 ? videoList.length : 5));
         // 平均赞数量
         videoAvgLikes = formatNum(Number(likes) / Number(totalVideo));
         // 播放/粉丝
@@ -351,22 +353,57 @@ color: #F00!important;
         // new Intl.NumberFormat("zh-CN", {style: "percent", minimumFractionDigits: 2}).format(num);
         avgLikesPerAvgViews = new Intl.NumberFormat("zh-CN", {style: "percent", minimumFractionDigits: 2}).format(Number(videoAvgLikes) / Number(videoAvgViews));
 
-        const dataElement = `<div class="n-data">
-<p class="n-data-k"><span>均播</span></p><span class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</span>
-</div><div class="n-data">
-<p class="n-data-k"><span>近30</span></p><span class="n-data-v ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</span>
+        const dataElement = `<div class="item">
+<p class="item-word"><span>均播</span></p>
+<span class="item-num ${playColorCalc(videoAvgViews)}">${videoAvgViews}</span>
 </div>
-<div class="n-data">
-<p class="n-data-k"><span>近5播</span></p><span class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</span>
+
+<div class="item">
+<p class="item-word"><span>近30</span></p>
+<span class="item-num ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</span>
 </div>
-<div class="n-data">
-<p class="n-data-k"><span>均赞</span></p><span class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</span>
+
+<div class="item">
+<p class="item-word"><span>近5播</span></p>
+<span class="item-num ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</span>
 </div>
-<div class="n-data" style="border-left:2px solid #000;">
-<p class="n-data-k"><span>赞/播</span></p><span class="n-data-v ${bonusColorCalc(Number(videoAvgLikes) / Number(videoAvgViews))}">${avgLikesPerAvgViews}</span>
+
+<div class="item">
+<p class="item-word"><span>均赞</span></p>
+<span class="item-num ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</span>
+</div>
+
+<div class="item">
+<p class="item-word"><span>赞/播</span></p>
+<span class="item-num ${bonusColorCalc(Number(videoAvgLikes) / Number(videoAvgViews))}">${avgLikesPerAvgViews}</span>
 </div>
 `
-        const newDiv = `<div id="myData" class="n-statistics">${dataElement}</div>`;
+        const newDiv = `<div id="myData" class="ctr">${dataElement}</div>`;
+
+        const info = `
+        【UP: ${idName}】
+        全投稿平均播放: ${videoAvgViews}
+        最近30条视频均播: ${avgPlayVideo30}
+        最近5条视频均播: ${avgPlayVideo5}
+        平均点赞: ${videoAvgLikes}
+        
+        总播放量/粉丝数: ${viewsPerFollowers}
+        
+        视频总数: ${totalVideo}
+        全投稿平均播放: ${videoAvgViews}
+        粉丝数: ${followers}
+        总播放量: ${views}
+        总点赞数: ${likes}
+        平均点赞: ${videoAvgLikes}
+        
+        首页视频数: ${videoList.length}
+        最近30条视频总播: ${videoPlayCount30}
+        最近30条视频均播: ${avgPlayVideo30}
+        
+        最近5条视频总播: ${videoPlayCount5}
+        最近5条视频均播: ${avgPlayVideo5}
+        `
+        console.log(info)
 
         if (refreshCount === 1) {
             dataPanel.insertAdjacentHTML('beforeend', newDiv)
@@ -383,136 +420,33 @@ color: #F00!important;
 
     }, getRandomInt({ min: 900, max: 2521,}))
 
-    // return
-
-    /*fetch(`https://api.bilibili.com/x/space/wbi/arc/search?mid=${uid}`, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-        },
-        timeout: 5000,
-    })
-    .then((response) => {
-      console.log(`response: `, response)
-      return response.json()
-    })
-    .then(res => {
-        // console.log('-------------------------')
-        // console.log(res.data)
-        // videoList.add(res.data.list.vlist)
-        videoList = res.data.list.vlist
-        totalVideo = res.data.page.count
-        // console.log('videoList: ', videoList)
-        videoList.forEach((item, index, arr) => {
-            // console.log(item)
-            // console.log(item.play)
-            if (index <= 4) {
-                videoPlayCount5 += item.play
-                videoDanmuCount5 += item.video_review
-                videoCommentCount5 += item.comment
-            }
-            videoPlayCount30 += item.play
-            videoDanmuCount30 += item.video_review
-            videoCommentCount30 += item.comment
-        })
-    })
-    .then(() => {
-        // console.log('-----------拿到数据了-----------')
-        const timer = setInterval(function () {
-            console.log(`--------------------[Start ${refreshCount + 1}]--------------------`)
-            if (refreshCount >= 2) {
-                clearInterval(timer)
-            }
-            refreshCount += 1
-            if (videoList.length === 0) {
-                return
-            }
-
-            // console.log('videoPlayCount5: ', videoPlayCount5)
-            // console.log('videoPlayCount30: ', videoPlayCount30)
-
-            // 首页近30视频平均播放量
-            const avgPlayVideo30 = formatNum(videoPlayCount30 / videoList.length)
-            // 首页近30视频平均弹幕量
-            const avgDanmuVideo30 = formatNum(videoDanmuCount30 / videoList.length)
-            // 首页近30视频平均评论量
-            const avgCommentVideo30 = formatNum(videoCommentCount30 / videoList.length)
-
-            // 近5条视频平均播放量
-            const avgPlayVideo5 = formatNum(videoPlayCount5 / (videoList.length < 5 ? videoList.length : 5))
-            // 近5条视频平均弹幕量
-            const avgDanmuVideo5 = formatNum(videoDanmuCount5 / (videoList.length < 5 ? videoList.length : 5))
-            // 近5条视频平均评论量
-            const avgCommentVideo5 = formatNum(videoCommentCount5 / (videoList.length < 5 ? videoList.length : 5))
-
-            const info = `
-【UP: ${idName}】
-全投稿平均播放: ${videoAvgViews}
-最近30条视频均播: ${avgPlayVideo30}
-最近5条视频均播: ${avgPlayVideo5}
-平均点赞: ${videoAvgLikes}
-
-总播放量/粉丝数: ${viewsPerFollowers}
-
-视频总数: ${totalVideo}
-全投稿平均播放: ${videoAvgViews}
-粉丝数: ${followers}
-总播放量: ${views}
-总点赞数: ${likes}
-平均点赞: ${videoAvgLikes}
-
-首页视频数: ${videoList.length}
-最近30条视频总播: ${videoPlayCount30}
-最近30条视频均播: ${avgPlayVideo30}
-最近30条视频平均弹幕: ${avgDanmuVideo30}
-最近30条视频平均评论: ${avgCommentVideo30}
-
-最近5条视频总播: ${videoPlayCount5}
-最近5条视频均播: ${avgPlayVideo5}
-最近5条视频平均弹幕: ${avgDanmuVideo5}
-最近5条视频平均评论: ${avgCommentVideo5}
-`
-            console.log(info)
-
-            const dataElement = `<div class="n-data">
-<p class="n-data-k"><b>均播</b></p><b class="n-data-v ${playColorCalc(videoAvgViews)}">${videoAvgViews}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>近30</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo30)}">${avgPlayVideo30}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>近5播</b></p><b class="n-data-v ${playColorCalc(avgPlayVideo5)}">${avgPlayVideo5}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>均赞</b></p><b class="n-data-v ${likeColorCalc(videoAvgLikes)}">${videoAvgLikes}</b>
-</div>
-<div class="n-data" style="border-left: 1px solid #000;">
-<p class="n-data-k"><b>近30弹幕</b></p><b class="n-data-v ${danmuColorCalc(avgDanmuVideo30)}">${avgDanmuVideo30}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>近5弹幕</b></p><b class="n-data-v ${danmuColorCalc(avgDanmuVideo5)}">${avgDanmuVideo5}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>近30评论</b></p><b class="n-data-v ${CommentColorCalc(avgCommentVideo30)}">${avgCommentVideo30}</b>
-</div>
-<div class="n-data">
-<p class="n-data-k"><b>近5评论</b></p><b class="n-data-v ${CommentColorCalc(avgCommentVideo5)}">${avgCommentVideo5}</b>
-</div>
-<div class="n-data" style="border-left: 1px solid #000;">
-<p class="n-data-k">播/粉</p><p class="n-data-v">${viewsPerFollowers}</p>
-</div>
-`
-            const newDiv = `<div id="myData" class="n-statistics" style="border-left: 1px solid #000;">${dataElement}</div>
-`;
-            if (refreshCount === 1) {
-                dataPanel.insertAdjacentHTML('beforeend', newDiv)
-            } else {
-                const myDataEl = document.querySelector('#myData')
-                myDataEl.innerHTML = dataElement
-            }
-            // 1200
-        }, 1200)
-    })
-    .catch((e) => {
-      console.log('Err: ', e)
-    })*/
 })()
+
+        // const info = `
+        // 【UP: ${idName}】
+        // 全投稿平均播放: ${videoAvgViews}
+        // 最近30条视频均播: ${avgPlayVideo30}
+        // 最近5条视频均播: ${avgPlayVideo5}
+        // 平均点赞: ${videoAvgLikes}
+        
+        // 总播放量/粉丝数: ${viewsPerFollowers}
+        
+        // 视频总数: ${totalVideo}
+        // 全投稿平均播放: ${videoAvgViews}
+        // 粉丝数: ${followers}
+        // 总播放量: ${views}
+        // 总点赞数: ${likes}
+        // 平均点赞: ${videoAvgLikes}
+        
+        // 首页视频数: ${videoList.length}
+        // 最近30条视频总播: ${videoPlayCount30}
+        // 最近30条视频均播: ${avgPlayVideo30}
+        // 最近30条视频平均弹幕: ${avgDanmuVideo30}
+        // 最近30条视频平均评论: ${avgCommentVideo30}
+        
+        // 最近5条视频总播: ${videoPlayCount5}
+        // 最近5条视频均播: ${avgPlayVideo5}
+        // 最近5条视频平均弹幕: ${avgDanmuVideo5}
+        // 最近5条视频平均评论: ${avgCommentVideo5}
+        // `
+        // console.log(info)
