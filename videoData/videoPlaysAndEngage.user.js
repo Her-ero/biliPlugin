@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.9.3
+// @version       1.9.4
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -16,10 +16,11 @@
 // @license       MPL-2.0
 // ==/UserScript==
 (async function () {
-
 const pathname = window.location.pathname;
-
 'use strict';
+document.querySelector('.copyright.item').innerText=''
+document.querySelector('.view.item').innerText=''
+
 let styleNode = document.createElement("style");
 styleNode.setAttribute("type", "text/css");
 styleNode.innerHTML = `
@@ -221,13 +222,18 @@ ${url}
 
     const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #9c27b0"><b>评:${commentCountNum}</b></span><span id="zan" title="赞" class="item" style="color: #9c27b0"><b>赞:${likeCountNum}</b></span><span id="bi" title="投币" class="item" style="color: #9c27b0"><b>币:${coinCountNum}</b></span><span id="cang" title="收藏" class="item" style="color: #9c27b0"><b>藏:${favoriteCountNum}</b></span><span id="zhuan" title="转发" class="item" style="color: #9c27b0"><b>转:${shareCountNum}</b></span>`
 
+    const timeEl = document.querySelector('.pubdate-ip-text')
     const timer1 = setInterval(function () {
+        document.querySelector('.copyright.item').innerText=''
+        document.querySelector('.view.item').innerText=''
+        
         if (refreshCount >= 4) {
             clearInterval(timer1)
         }
         console.log(`--------------------[Start ${refreshCount + 1}]--------------------`)
 
         if (refreshCount <= 0) {
+            timeEl.innerText = `时间: ${timeEl.innerText}`
             dataList.insertAdjacentHTML('afterbegin', newElement)
             // 隐藏弹幕显示
             var dmTarget = document.querySelector('.dm.item')
