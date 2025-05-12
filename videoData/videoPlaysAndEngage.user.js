@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       2.0.0
+// @version       2.0.1
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -58,6 +58,8 @@ try {
     // 隐藏版权和播放量的icon
     document.querySelector('.copyright.item').innerText=''
     document.querySelector('.view.item').innerText=''
+    // 隐藏弹幕icon显示
+    document.querySelector('.dm.item').innerText=''
 } catch (error) {
     
 }
@@ -269,7 +271,9 @@ ${url}
             timeEl.innerText = timeNewStr
             // 隐藏版权和播放量的icon
             document.querySelector('.copyright.item').innerText=''
-            document.querySelector('.view.item').innerText=''            
+            document.querySelector('.view.item').innerText=''
+            // 隐藏弹幕icon显示
+            document.querySelector('.dm.item').innerText=''
         } catch (error) {
             
         }
@@ -281,9 +285,6 @@ ${url}
 
         if (refreshCount <= 0) {
             dataList.insertAdjacentHTML('afterbegin', newElement)
-            // 隐藏弹幕icon显示
-            var dmTarget = document.querySelector('.dm.item')
-            dmTarget.style.display = 'none'
         } else {
             const viewEl = document.querySelector('#bofang')
             if (!viewEl) {
