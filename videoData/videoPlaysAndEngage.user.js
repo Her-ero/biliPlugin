@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          B站视频播放量和互动量
-// @version       1.9.4
+// @version       2.0.0
 // @description   辅助查看B站视频的播放量和互动量
 // @author        Her-ero
 // @namespace     https://github.com/Her-ero
@@ -18,8 +18,49 @@
 (async function () {
 const pathname = window.location.pathname;
 'use strict';
-document.querySelector('.copyright.item').innerText=''
-document.querySelector('.view.item').innerText=''
+// 生成新时间字符
+const timeEl = document.querySelector('.pubdate-ip-text')
+const timeNewStr = `时间: ${timeEl.innerText}`
+
+// 读取Tag关键词库
+var keywords = localStorage.getItem('MyKeywords')
+var keywordsArr = keywords ? JSON.parse(keywords) : []
+console.log('-------------MyKeywords-------------')
+console.log(keywordsArr);
+console.log('-------------MyKeywords-------------')
+
+// 获取标签
+var tags = document.querySelectorAll('.tag-link')
+var tagStrArr = []
+tags.forEach(function (tag, index) {
+    if (tag.className.includes('topic-link')) {
+        tagStrArr.push(tag.title)
+    }
+    tagStrArr.push(tag.innerText)
+})
+// console.log(tagStrArr)
+// var matchedKeywords = keywordsArr.filter(keyword =>
+//     tagStrArr.some(tag => tag.includes(keyword))
+// )
+
+// 标签命中检查
+var matchedKeywordsWithIndex = keywordsArr.reduce((acc, keyword, index) => {
+    if (tagStrArr.some(tag => tag.includes(keyword))) {
+        acc.push(index += 1);
+    }
+    return acc;
+}, [])
+
+// console.log(matchedKeywords)
+console.log('中了这些标签下标：', matchedKeywordsWithIndex)
+
+try {
+    // 隐藏版权和播放量的icon
+    document.querySelector('.copyright.item').innerText=''
+    document.querySelector('.view.item').innerText=''
+} catch (error) {
+    
+}
 
 let styleNode = document.createElement("style");
 styleNode.setAttribute("type", "text/css");
@@ -108,7 +149,7 @@ headNode.appendChild(styleNode)
         const response = await fetch(`https://api.bilibili.com/x/relation/stat?vmid=${uid}`)
         return response.json();
     }
-    
+
     async function getVideoData({BV, AV}) {
         if (BV) {
             const response = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${BV}`)
@@ -117,7 +158,6 @@ headNode.appendChild(styleNode)
         const response = await fetch(`https://api.bilibili.com/x/web-interface/view?aid=${AV}`)
         return response.json();
     }
-
 
 
     const url = `${window.location.origin}${window.location.pathname}`
@@ -129,7 +169,7 @@ headNode.appendChild(styleNode)
 
     const dataList = document.querySelector('.video-info-detail-list')
     const datetimeEl = document.querySelector('.pubdate-ip-text')
-    
+
     // 检查页面是av还是BV
     // https://www.bilibili.com/video/av113775831220963/
     const match = pathname.match(/av(\d+)/);
@@ -137,7 +177,7 @@ headNode.appendChild(styleNode)
     // 如果匹配成功，提取数字
     if (match) {
         const avNum = match[1];
-        console.log(avNum); // 输出: 113775831220963
+        // console.log(avNum); // 输出: 113775831220963
         videoData = await getVideoData({AV: avNum})
     } else {
         // https://www.bilibili.com/video/BV19a4y1g7fe
@@ -220,22 +260,28 @@ ${url}
     /* clipboard end */
     // 弹 评 赞 币 藏 转
 
-    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #9c27b0"><b>评:${commentCountNum}</b></span><span id="zan" title="赞" class="item" style="color: #9c27b0"><b>赞:${likeCountNum}</b></span><span id="bi" title="投币" class="item" style="color: #9c27b0"><b>币:${coinCountNum}</b></span><span id="cang" title="收藏" class="item" style="color: #9c27b0"><b>藏:${favoriteCountNum}</b></span><span id="zhuan" title="转发" class="item" style="color: #9c27b0"><b>转:${shareCountNum}</b></span>`
+    const newElement = `<span id="bofang" title="播放" class="item" style="color: #E11"><b>播:${viewCountNum}</b></span><span id="hudong" title="互动" class="item" style="color: #007FEC"><b>互:${EngageCountNum}</b></span><span id="danmu" title="弹幕" class="item" style="color: #9c27b0"><b>弹:${dmCountNum}</b></span><span id="pinglun" title="评论" class="item" style="color: #9c27b0"><b>评:${commentCountNum}</b></span><span id="zan" title="赞" class="item" style="color: #9c27b0"><b>赞:${likeCountNum}</b></span><span id="bi" title="投币" class="item" style="color: #9c27b0"><b>币:${coinCountNum}</b></span><span id="cang" title="收藏" class="item" style="color: #9c27b0"><b>藏:${favoriteCountNum}</b></span><span id="zhuan" title="转发" class="item" style="color: #9c27b0"><b>转:${shareCountNum}</b></span><span id="biao" title="标签" class="item" style="color: #9c27b0"><b>标:${matchedKeywordsWithIndex.length > 0 ? matchedKeywordsWithIndex.join('').toString() : '0'}</b></span>`
 
-    const timeEl = document.querySelector('.pubdate-ip-text')
+
     const timer1 = setInterval(function () {
-        document.querySelector('.copyright.item').innerText=''
-        document.querySelector('.view.item').innerText=''
-        
+        try {
+            // 显示新时间字符
+            timeEl.innerText = timeNewStr
+            // 隐藏版权和播放量的icon
+            document.querySelector('.copyright.item').innerText=''
+            document.querySelector('.view.item').innerText=''            
+        } catch (error) {
+            
+        }
+
         if (refreshCount >= 4) {
             clearInterval(timer1)
         }
         console.log(`--------------------[Start ${refreshCount + 1}]--------------------`)
 
         if (refreshCount <= 0) {
-            timeEl.innerText = `时间: ${timeEl.innerText}`
             dataList.insertAdjacentHTML('afterbegin', newElement)
-            // 隐藏弹幕显示
+            // 隐藏弹幕icon显示
             var dmTarget = document.querySelector('.dm.item')
             dmTarget.style.display = 'none'
         } else {
